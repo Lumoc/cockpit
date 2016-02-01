@@ -23,11 +23,11 @@ class GithubImageTask(object):
                 "requests": [
                     # Create issue
                     { "method": "POST",
-                      "resource": github.base + "issues",
+                      "resource": github.qualify("issues"),
                       "data": {
                           "title": testinfra.ISSUE_TITLE_IMAGE_REFRESH.format(self.image),
                           "labels": [ "bot" ],
-                          "body": ("Image creation for %s in process on %s.\nLog: ${sink/link}"
+                          "body": ("Image creation for %s in process on %s.\nLog: :link"
                                    % (self.image, testinfra.HOSTNAME))
                       },
                       "result": "issue"
@@ -41,7 +41,7 @@ class GithubImageTask(object):
                     "requests": [
                         # Post comment about failure
                         { "method": "POST",
-                          "resource": "${issue/url}/comments",
+                          "resource": ":issue.comments_url",
                           "data": {
                               "body": "Image creation aborted",
                           }
@@ -67,7 +67,7 @@ class GithubImageTask(object):
         requests = [
             # Post comment
             { "method": "POST",
-              "resource": "${issue/url}/comments",
+              "resource": ":issue.comments_url",
               "data": {
                   "body": message
               }
@@ -78,9 +78,9 @@ class GithubImageTask(object):
             requests += [
                 # Turn issue into pull request
                 { "method": "POST",
-                  "resource": github.base + "pulls",
+                  "resource": github.qualify("pulls"),
                   "data": {
-                      "issue": "{issue/number}",
+                      "issue": ":issue.number",
                       "head": branch,
                       "base": "master"
                   },
@@ -92,7 +92,7 @@ class GithubImageTask(object):
                 requests += [
                     # Trigger testing
                     { "method": "POST",
-                      "resource": github.base + "statuses/${pull/head/sha}",
+                      "resource": github.qualify("statuses/:pull.head.sha"),
                       "data": {
                           "state": "pending",
                           "context": t,
