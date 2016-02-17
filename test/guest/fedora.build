@@ -41,9 +41,16 @@ os=$2
 arch=$3
 test -z "$BOOTSTRAP_VOLUME_SIZE" && BOOTSTRAP_VOLUME_SIZE="8G"
 
+# Don't cache the templates when we run inside a Docker container
+#
+if [ -f /.dockerinit ]; then
+    virt_builder_caching="--no-cache"
+fi
+
 # we can't use virt-builder --ssh-inject until all our target systems support this
 
 virt-builder "$os" \
+             $virt_builder_caching \
              --output "$out" \
              --size $BOOTSTRAP_VOLUME_SIZE \
              --format qcow2 \

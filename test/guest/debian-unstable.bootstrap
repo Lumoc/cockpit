@@ -7,7 +7,14 @@ BASE=$(dirname $0)
 out=$1
 arch=$2
 
+# Don't cache the templates when we run inside a Docker container
+#
+if [ -f /.dockerinit ]; then
+    virt_builder_caching="--no-cache"
+fi
+
 virt-builder debian-8 \
+             $virt_builder_caching \
              --output "$out" \
              --size 8G \
              --format qcow2 \
