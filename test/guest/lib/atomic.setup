@@ -32,6 +32,9 @@ ostree checkout "$ref" /var/local-tree
 # we need cockpit/ws as well
 docker pull cockpit/ws
 
+# Delete old ostree
+ostree admin undeploy 1
+
 # reduce image size
 /var/lib/testvm/zero-disk.setup
 
