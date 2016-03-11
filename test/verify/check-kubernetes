@@ -35,7 +35,6 @@ class TestKubernetes(KubernetesCase, KubernetesCommonTests):
         KubernetesCase.setUp(self)
         m = self.machine
 
-        self.fix_apiserver_config()
         self.start_kubernetes()
 
         m.upload(["verify/files/mock-k8s-tiny-app.json"], "/tmp")
@@ -58,7 +57,6 @@ class TestConnection(KubernetesCase):
         # Start a kube-apiserver with a 'wrong' http port, forcing use of https
         m.execute("echo 'KUBE_API_PORT=\"--port=1111\"' >> /etc/kubernetes/apiserver")
         m.execute("sed -i s/8080/1111/g /etc/kubernetes/*")
-        self.fix_apiserver_config()
         self.start_kubernetes()
         self.wait_api_server(port=6443, scheme='https')
 
@@ -82,7 +80,7 @@ class TestConnection(KubernetesCase):
         m.execute("sed -i s/8080/1111/g /etc/kubernetes/*")
 
         # Require authentication from kube
-        m.execute("echo 'KUBE_API_ARGS=\"--basic_auth_file=/etc/kubernetes/passwd --authorization_mode=ABAC --authorization_policy_file=/etc/kubernetes/authorization\"' >> /etc/kubernetes/apiserver")
+        m.execute("echo 'KUBE_API_ARGS=\"$KUBE_API_ARGS --basic_auth_file=/etc/kubernetes/passwd --authorization_mode=ABAC --authorization_policy_file=/etc/kubernetes/authorization\"' >> /etc/kubernetes/apiserver")
         m.execute("echo '{\"user\":\"admin\"}' > /etc/kubernetes/authorization")
         m.execute("echo 'fubar,admin,10101' > /etc/kubernetes/passwd")
 
@@ -90,7 +88,6 @@ class TestConnection(KubernetesCase):
         m.upload(["verify/files/mock-kube-config-basic.json"], "/tmp")
         m.execute("mkdir -p /home/admin/.kube/ && mv /tmp/mock-kube-config-basic.json /home/admin/.kube/config")
 
-        self.fix_apiserver_config()
         m.execute("systemctl start etcd kube-apiserver")
         self.wait_api_server(port=6443, scheme='https')
 
@@ -110,7 +107,6 @@ class TestNulecule(KubernetesCase):
         KubernetesCase.setUp(self)
         m = self.machine
 
-        self.fix_apiserver_config()
         self.start_kubernetes()
         self.wait_api_server()
 

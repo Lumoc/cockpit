@@ -127,7 +127,6 @@ class KubernetesCase(KubernetesContainerCase, kubelib.KubernetesCommonTests):
     def setUp(self):
         super(KubernetesCase, self).setUp()
         self.start_kubernetes()
-        self.fix_apiserver_config()
         self.setup_basic_auth()
         self.start_kubernetes()
 
