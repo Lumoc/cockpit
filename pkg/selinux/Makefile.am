@@ -27,15 +27,18 @@ setroubleshootdebug_DATA = \
 	$(PKGDIR)/bundle.js \
 	$(PKGDIR)/setroubleshoot.css \
 	$(PKGDIR)/setroubleshoot.html \
+  $(PKGDIR)/setroubleshoot.js \
+  $(PKGDIR)/setroubleshoot-client.js \
+  $(PKGDIR)/views/setroubleshoot-view.js \
 	$(NULL)
 
 install-data-hook::
 	mkdir -p $(DESTDIR)$(setroubleshootdebugdir)
 	tar -chf - -C $(srcdir) $(setroubleshoot_MODULES) | tar -xf - --strip-components=2 -C $(DESTDIR)$(setroubleshootdebugdir)
 
-uninstall-hook:
-	rm -rf $(DESTDIR)$(setroubleshootdebugdir)/scripts
-	rm -rf $(DESTDIR)$(setroubleshootdebugdir)/views
+#uninstall-hook:
+#	rm -rf $(DESTDIR)$(setroubleshootdebugdir)/scripts
+#	rm -rf $(DESTDIR)$(setroubleshootdebugdir)/views
 
 setroubleshoot_MIN = $(setroubleshoot_MODULES:.js=.min.js)
 
