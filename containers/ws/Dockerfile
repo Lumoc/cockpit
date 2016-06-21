@@ -4,8 +4,8 @@ MAINTAINER "Stef Walter" <stefw@redhat.com>
 RUN dnf -y update
 RUN dnf install sed
 
-ARG RELEASE
-ARG VERSION
+ARG RELEASE=1
+ARG VERSION=0.111
 
 # If there are rpm files in the current directory we'll install those,
 # otherwise use cockpit-preview repo. The Dockerfile is a hack around
