@@ -1,0 +1,11 @@
+dependencies:
+    pre:
+      - sudo sysctl -w net.ipv6.conf.lo.disable_ipv6=0 net.ipv6.conf.default.disable_ipv6=0 net.ipv6.conf.all.disable_ipv6=0
+      - sudo add-apt-repository -y "deb http://archive.ubuntu.com/ubuntu/ trusty main universe"
+      - sudo apt-get update -qq
+    override:
+      - sudo apt-get --no-install-recommends install autoconf automake gdb glib-networking gtk-doc-tools intltool libgirepository1.0-dev libglib2.0-dev libgudev-1.0-dev libjavascript-minifier-xs-perl libjson-glib-dev libjson-perl libkeyutils-dev liblvm2-dev libnm-glib-dev libpam0g-dev libpcp3-dev libpcp-import1-dev libpcp-pmda3-dev libpolkit-agent-1-dev libpolkit-gobject-1-dev libssh-dev libsystemd-daemon-dev libsystemd-journal-dev pcp pkg-config valgrind xmlto xsltproc
+
+test:
+    override:
+      - ./autogen.sh --prefix=/usr --enable-strict --with-systemdunitdir=/tmp && make V=1 all && sudo make enable-root-tests && make distcheck && make -j8 check-memory
