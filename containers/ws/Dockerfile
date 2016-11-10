@@ -1,8 +1,8 @@
 FROM fedora:24
 MAINTAINER "Stef Walter" <stefw@redhat.com>
 
-ARG RELEASE
-ARG VERSION
+ARG RELEASE=1
+ARG VERSION=123
 ARG COCKPIT_RPM_URL=https://kojipkgs.fedoraproject.org/packages/cockpit
 
 ADD . /container
