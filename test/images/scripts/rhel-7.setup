@@ -106,6 +106,7 @@ sssd \
 "
 
 TEST_PACKAGES="\
+ntfsprogs \
 systemtap-runtime-virtguest \
 valgrind \
 gdb \
