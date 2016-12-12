@@ -172,6 +172,9 @@ find %{buildroot}%{_datadir}/%{name}/systemd -type f >> system.list
 echo '%dir %{_datadir}/%{name}/users' >> system.list
 find %{buildroot}%{_datadir}/%{name}/users -type f >> system.list
 
+echo '%dir %{_datadir}/%{name}/kdump' >> kdump.list
+find %{buildroot}%{_datadir}/%{name}/kdump -type f >> kdump.list
+
 echo '%dir %{_datadir}/%{name}/sosreport' > sosreport.list
 find %{buildroot}%{_datadir}/%{name}/sosreport -type f >> sosreport.list
 
@@ -228,9 +231,9 @@ sed -i '/\.map\(\.gz\)\?$/d' *.list
 tar -C %{buildroot}/usr/src/debug -cf - . | tar -C %{buildroot} -xf -
 rm -rf %{buildroot}/usr/src/debug
 
-# On RHEL subscriptions, networkmanager, selinux, and sosreport are part of the system package
+# On RHEL kdump, subscriptions, networkmanager, selinux, and sosreport are part of the system package
 %if 0%{?rhel}
-cat subscriptions.list sosreport.list networkmanager.list selinux.list >> system.list
+cat kdump.list subscriptions.list sosreport.list networkmanager.list selinux.list >> system.list
 %endif
 
 %find_lang %{name}
@@ -455,6 +458,17 @@ test -f %{_bindir}/firewall-cmd && firewall-cmd --reload --quiet || true
 # Conditional Sub-packages
 
 %if 0%{?rhel} == 0
+
+%package kdump
+Summary: Cockpit user interface for kernel crash dumping
+Requires: %{name}-bridge >= %{required_base}
+Requires: %{name}-shell >= %{required_base}
+BuildArch: noarch
+
+%description kdump
+The Cockpit component for configuring kernel crash dumping.
+
+%files kdump -f kdump.list
 
 %package sosreport
 Summary: Cockpit user interface for diagnostic reports
