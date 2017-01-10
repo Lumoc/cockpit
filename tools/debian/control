@@ -105,6 +105,13 @@ Depends: ${misc:Depends},
 Description: Cockpit PCP integration
  Cockpit support for reading PCP metrics and loading PCP archives.
 
+Package: cockpit-storaged
+Architecture: any
+Depends: ${misc:Depends},
+         udisks2 | storaged
+Description: Cockpit user interface for storage
+ The Cockpit components for interacting with storage.
+
 Package: cockpit-system
 Architecture: any
 Depends: ${misc:Depends},
@@ -119,13 +126,6 @@ Provides: cockpit-realmd,
 Description: Cockpit admin interface for a system
  Cockpit admin interface package for configuring and
  troubleshooting a system.
-
-Package: cockpit-storaged
-Architecture: any
-Depends: ${misc:Depends},
-         udisks2 | storaged
-Description: Cockpit user interface for storage
- The Cockpit components for interacting with storage.
 
 Package: cockpit-test-assets
 Architecture: any
