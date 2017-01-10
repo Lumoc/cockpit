@@ -6,6 +6,7 @@ lib/*/security/pam_ssh_add.so
 usr/lib/cockpit/cockpit-session
 usr/lib/cockpit/cockpit-ssh
 usr/lib/cockpit/cockpit-ws
+usr/lib/cockpit/cockpit-stub
 usr/lib/firewalld/services/cockpit.xml
 usr/sbin/remotectl
 usr/share/cockpit/branding/
