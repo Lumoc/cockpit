@@ -1,3 +1,5 @@
 # dist/ is (pre-)built by webpack from pkg/, see webpack.config.js
 cockpit source: source-is-missing dist/*min.js
 cockpit source: source-is-missing dist/shell/po.*.js *
+# false-positive heuristics, this is actual source
+cockpit source: source-is-missing pkg/kubernetes/scripts/test-images.js line length*
