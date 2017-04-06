@@ -24,8 +24,7 @@ network-manager \
 policykit-1 \
 realmd \
 selinux-basics \
-storaged \
-storaged-lvm2 \
+udisks2 \
 thin-provisioning-tools \
 xdg-utils \
 "
@@ -48,7 +47,7 @@ virtinst \
 useradd -m -U -c Administrator -G sudo -s /bin/bash admin
 echo admin:foobar | chpasswd
 
-# For storaged
+# For latest udisks
 echo "deb http://deb.debian.org/debian experimental main" >/etc/apt/sources.list.d/experimental.list
 # FIXME: we need to enable jessie-backports until docker.io gets back into testing
 echo "deb http://deb.debian.org/debian jessie-backports main" >/etc/apt/sources.list.d/jessie-backports.list
@@ -56,6 +55,7 @@ apt-get -y update
 
 export DEBIAN_FRONTEND=noninteractive
 eatmydata apt-get -y install $TEST_PACKAGES $COCKPIT_DEPS $IPA_CLIENT_PACKAGES
+eatmydata apt-get -y install -t experimental udisks2
 
 # Prepare for building
 #
