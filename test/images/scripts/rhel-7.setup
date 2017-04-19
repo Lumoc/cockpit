@@ -26,10 +26,11 @@ SKIP_REPO_FLAG="/root/.skip_repos"
 
 if [ ! -f "$SKIP_REPO_FLAG" ]; then
     # Remove any internal files
-    rm /etc/yum.repos.d/download.devel.redhat.com.repo
+    rm -f /etc/yum.repos.d/download.devel.redhat.com.repo
 
+    cp ~/.rhel/nightly.repo /etc/yum.repos.d/ || true
     # register system
-    subscription-manager register --auto-attach --username=`cat ~/.rhel/login` --password=`cat ~/.rhel/pass`
+    subscription-manager register --auto-attach --username=`cat ~/.rhel/login` --password=`cat ~/.rhel/pass` || true
     # remove credentials from test machine
     rm -rf ~/.rhel
 fi
@@ -44,9 +45,9 @@ if [ ! -f "$SKIP_REPO_FLAG" ]; then
     # Configure repositories.
     #
     # if disabling the repos doesn't work, do without
-    yum -y --disablerepo=rhel-7-server-htb-rpms --disablerepo=rhel-sjis-for-rhel-7-server-rpms install yum-utils || yum -y install yum-utils
-    yum-config-manager --enable rhel-7-server-optional-rpms
-    yum-config-manager --enable rhel-7-server-extras-rpms
+    yum -y --disablerepo=rhel-7-server-htb-rpms --disablerepo=rhel-sjis-for-rhel-7-server-rpms install yum-utils || yum -y install yum-utils || true
+    yum-config-manager --enable rhel-7-server-optional-rpms || true
+    yum-config-manager --enable rhel-7-server-extras-rpms || true
 
     # the following don't necessarily need to work
     yum-config-manager --disable rhel-sjis-for-rhel-7-server-rpms || true
@@ -143,7 +144,7 @@ fi
 yum clean all || true
 
 if [ ! -f "$SKIP_REPO_FLAG" ]; then
-    subscription-manager unregister
+    subscription-manager unregister || true
 fi
 
 # For the D-Bus test server
