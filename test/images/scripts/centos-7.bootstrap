@@ -1,4 +1,7 @@
 #! /bin/bash
 
 BASE=$(dirname $0)
-$BASE/virt-builder-fedora "$1" centos-7.3 x86_64
+# get the latest centos-7 virt-builder has to offer
+CENTOS_LATEST=$(virt-builder -l | sort -r | grep -m 1 centos-7 | cut -d" " -f1)
+
+$BASE/virt-builder-fedora "$1" "$CENTOS_LATEST" x86_64
