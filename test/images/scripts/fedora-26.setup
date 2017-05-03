@@ -89,14 +89,11 @@ dnf $DNF_OPTS -y install $TEST_PACKAGES $COCKPIT_DEPS $IPA_CLIENT_PACKAGES
 dnf $DNF_OPTS -y install mock dnf-plugins-core rpm-build
 useradd -c Builder -G mock builder
 
-# HACK - mock --installdeps with yum is broken, it seems that it can't
-# run any package scriptlets.  Yum is deprecated anyway so we just use
-# dnf.  I wonder why dnf isn't the default anyway...
+# HACK - mock --installdeps with systemd-nspawn is broken, it seems
+# that it forgets to copy the source rpm to a location inside the
+# container.
 #
-echo "config_opts['package_manager'] = 'dnf'" >>/etc/mock/site-defaults.cfg
-
-# HACK - Switch off gpgcheck while the repos and mirrors settle down
-sed -i -e 's/gpgcheck=1/gpgcheck=0/' /etc/mock/default.cfg
+echo "config_opts['use_nspawn'] = False" >>/etc/mock/site-defaults.cfg
 
 srpm=$(/var/lib/testvm/make-srpm $TEST_SOURCE)
 su builder -c "/usr/bin/mock --verbose --installdeps $srpm"
