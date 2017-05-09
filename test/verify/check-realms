@@ -48,8 +48,9 @@ def prepare_resolv(machine, address):
 @skipImage("No realmd available", "continuous-atomic", "fedora-atomic", "rhel-atomic")
 @skipImage("No freeipa available", "debian-stable", "debian-testing")
 class TestRealms(MachineCase):
-    additional_machines = {
-        'ipa': { 'machine': { 'image': 'ipa' }, 'start': { 'memory_mb': 2048 } }
+    provision = {
+        "0": { "address": "10.111.113.1/20" },
+        "ipa": { "image": "ipa", "memory_mb": 2048 }
     }
 
     def testIpa(self):
@@ -59,7 +60,7 @@ class TestRealms(MachineCase):
         self.login_and_go("/system")
 
         # Use the FreeIPA instance as the DNS server
-        prepare_resolv(m, self.machines['ipa'].address)
+        prepare_resolv(m, "10.111.112.100")
 
         # Wait for DNS to work as expected.
         # https://bugzilla.redhat.com/show_bug.cgi?id=1071356#c11
@@ -152,7 +153,7 @@ class TestRealms(MachineCase):
         self.login_and_go("/system")
 
         # Use the FreeIPA instance as the DNS server
-        prepare_resolv(m, self.machines['ipa'].address)
+        prepare_resolv(m, "10.111.112.100")
 
         # Wait for DNS to work as expected.
         # https://bugzilla.redhat.com/show_bug.cgi?id=1071356#c11
@@ -208,14 +209,15 @@ chown -R admin@cockpit.lan /home/admin
 @skipImage("No realmd available", "continuous-atomic", "fedora-atomic", "rhel-atomic")
 @skipImage("No freeipa available", "debian-stable", "debian-testing")
 class TestKerberos(MachineCase):
-    additional_machines = {
-        'ipa': { 'machine': { 'image': 'ipa' }, 'start': { 'memory_mb': 2048 } }
+    provision = {
+        "0": { "address": "10.111.113.1/20" },
+        "ipa": { "image": "ipa", "memory_mb": 2048 }
     }
 
     def configure_kerberos(self):
         # Setup a place for kerberos caches
-        args = { "addr": self.machines['ipa'].address, "password": "foobarfoo" }
-        prepare_resolv(self.machine, self.machines['ipa'].address)
+        args = { "addr": "10.111.112.100", "password": "foobarfoo" }
+        prepare_resolv(self.machine, "10.111.112.100")
         self.machine.execute(script=JOIN_SCRIPT % args)
 
     def tearDown(self):
@@ -240,7 +242,7 @@ class TestKerberos(MachineCase):
         self.machine.start_cockpit()
 
         output = self.machine.execute(['/usr/bin/curl -v -s',
-                                       '--resolve', 'x0.cockpit.lan:9090:%s' % self.machine.address,
+                                       '--resolve', 'x0.cockpit.lan:9090:10.111.113.1',
                                        'http://x0.cockpit.lan:9090/cockpit/login', '2>&1'])
         self.assertIn("HTTP/1.1 401", output)
         self.assertNotIn("WWW-Authenticate: Negotiate", output)
@@ -249,13 +251,13 @@ class TestKerberos(MachineCase):
         self.machine.restart_cockpit()
 
         output = self.machine.execute(['/usr/bin/curl', '-s', '--negotiate', '--delegation', 'always', '-u', ':', "-D", "-",
-                                       '--resolve', 'x0.cockpit.lan:9090:%s' % self.machine.address,
+                                       '--resolve', 'x0.cockpit.lan:9090:10.111.113.1',
                                        'http://x0.cockpit.lan:9090/cockpit/login'])
         self.assertIn("HTTP/1.1 200 OK", output)
         self.assertIn('"csrf-token"', output)
 
         cookie = re.search("Set-Cookie: cockpit=([^ ;]+)", output).group(1)
-        b.open("/system/terminal", cookie={ "name": "cockpit", "value": cookie, "domain": self.machine.address, "path": "/" })
+        b.open("/system/terminal", cookie={ "name": "cockpit", "value": cookie, "domain": self.machine.web_address, "path": "/" })
         b.wait_present('#content')
         b.wait_visible('#content')
         b.enter_page("/system/terminal")
