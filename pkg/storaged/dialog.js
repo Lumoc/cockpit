@@ -57,6 +57,8 @@
                 f.HasOptions = (f.Options.length > 0);
         });
 
+        if (def.Action && def.Action.Danger)
+            def.Action.DangerButton = true;
 
         function toggle_arrow(event) {
             /* jshint validthis:true */

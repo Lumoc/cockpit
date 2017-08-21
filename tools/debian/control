@@ -129,6 +129,8 @@ Architecture: all
 Depends: ${misc:Depends},
          udisks2 | storaged,
          cockpit-bridge (>= ${bridge:minversion}),
+         python3,
+         python3-dbus
 Description: Cockpit user interface for storage
  The Cockpit components for interacting with storage.
 
