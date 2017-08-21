@@ -389,6 +389,8 @@ fi
 Summary: Cockpit user interface for storage, using Storaged
 Requires: %{name}-shell >= %{required_base}
 Requires: storaged >= 2.1.1
+Requires: python
+Requires: python-dbus
 %if 0%{?fedora} >= 24 || 0%{?rhel} >= 8
 Recommends: storaged-lvm2 >= 2.1.1
 Recommends: storaged-iscsi >= 2.1.1
