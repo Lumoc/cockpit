@@ -18,9 +18,6 @@
 
 set -ex
 
-# Disable device renaming for predictable names between different qemus
-grubby --update-kernel=ALL --args="net.ifnames=0 biosdevname=0"
-
 # HACK: docker fails without /etc/resolv.conf
 # https://bugzilla.redhat.com/show_bug.cgi?id=1448331
 mkdir -p /etc/systemd/system/docker.service.d
