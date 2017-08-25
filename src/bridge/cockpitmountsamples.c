@@ -57,9 +57,9 @@ cockpit_mount_samples (CockpitSamples *samples)
       if (strlen (line) == 0)
         continue;
 
-      /* Only look at real devices
+      /* Only look at real devices and remote mounts
        */
-      if (line[0] != '/')
+      if (line[0] != '/' && strchr(line, ':') == NULL)
         continue;
 
       while (*line && !isspace (*line))
