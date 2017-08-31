@@ -25,6 +25,7 @@
 
     var mustache = require("mustache");
     require("patterns");
+    require("cockpit-components-file-autocomplete.css");
 
     var _ = cockpit.gettext;
 
@@ -206,11 +207,71 @@
             }
         });
 
+        /* ComboBoxes
+         */
+
+        $dialog.on("click", ".combobox-container .caret", function(ev) {
+            $(this).parents(".input-group").toggleClass("open");
+        });
+
+        $dialog.on("click", ".combobox-container li a", function(ev) {
+            $(this).parents(".input-group").find("input").val($(this).text()).trigger("change");
+            $(this).parents(".input-group").removeClass("open");
+        });
+
+        function combobox_set_choices(name, choices) {
+            if (typeof choices == 'function') {
+                $.when(choices(get_field_values())).then(function (result) {
+                    if (result !== false)
+                        combobox_set_choices(name, result);
+                });
+                return;
+            }
+
+            var $f = $dialog.find('[data-field="' + name + '"]');
+            var $ul = $f.find('ul');
+            $ul.empty().append(choices.map(function (c) {
+                return $('<li>').append($('<a>').text(c));
+            }));
+            $f.find(".caret").toggle(choices.length > 0);
+        }
+
+        var combobox_some_dynamic = false;
+
+        $dialog.find(".combobox-container .caret").hide();
+        def.Fields.forEach(function (f) {
+            if (f.ComboBox) {
+                if (typeof f.Choices == 'function')
+                    combobox_some_dynamic = true;
+                combobox_set_choices(f.ComboBox, f.Choices);
+            }
+        });
+
+        var combobox_timeout;
+
+        function combobox_reset_dynamic_choices() {
+            if (!combobox_some_dynamic)
+                return;
+
+            if (combobox_timeout)
+                window.clearTimeout(combobox_timeout);
+            combobox_timeout = window.setTimeout(function () {
+                def.Fields.forEach(function (f) {
+                    if (f.ComboBox && typeof f.Choices == 'function') {
+                        combobox_set_choices(f.ComboBox, f.Choices);
+                    }
+                });
+            }, 500);
+        }
+
+        /* Main
+         */
+
         var invisible = { };
 
         function get_name(f) {
             return (f.TextInput || f.PassInput || f.SelectOne || f.SelectMany || f.SizeInput ||
-                    f.SizeSlider || f.CheckBox || f.Arrow || f.SelectRow);
+                    f.SizeSlider || f.CheckBox || f.Arrow || f.SelectRow || f.ComboBox);
         }
 
         function get_field_values() {
@@ -242,6 +303,8 @@
                         if ($(e).hasClass('highlight-ct'))
                             vals[n] = f.Rows[i].value;
                     });
+                } else if (f.ComboBox) {
+                    vals[n] = $f.find('input[type=text]').val();
                 } else if (f.Arrow) {
                     vals[n] = !$f.hasClass('collapsed');
                 }
@@ -306,6 +369,7 @@
 
         $dialog.on('change input', function () {
             update_visibility();
+            combobox_reset_dynamic_choices();
         });
 
         function error_field_to_target(err) {
@@ -317,6 +381,16 @@
                 return err;
         }
 
+        function close() {
+            if (combobox_timeout)
+                window.clearTimeout(combobox_timeout);
+            $dialog.modal('hide');
+        }
+
+        $dialog.find('button[data-action="cancel"]').on('click', function () {
+            close();
+        });
+
         $dialog.find('button[data-action="apply"]').on('click', function () {
             var vals = get_validated_field_values();
             if (vals !== null) {
@@ -325,7 +399,7 @@
                     $dialog.dialog('wait', promise);
                     promise
                         .done(function (result) {
-                            $dialog.modal('hide');
+                            close();
                         })
                         .fail(function (err) {
                             if (def.Action.failure_filter)
@@ -339,7 +413,7 @@
                             }
                         });
                 } else {
-                    $dialog.modal('hide');
+                    close();
                 }
             }
         });
