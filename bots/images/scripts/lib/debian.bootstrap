@@ -27,5 +27,4 @@ virt-builder $virt_builder_image \
              --chmod 0600:/etc/ssh/ssh_host_rsa_key \
              --upload $BASE/../../../test/common/host_key.pub:/etc/ssh/ssh_host_rsa_key.pub \
              ${apt_source:+--write /etc/apt/sources.list:"$apt_source"} \
-             --write /etc/apt/apt.conf.d/90nolanguages:'Acquire::Languages "none";' \
-             --run-command "export DEBIAN_FRONTEND=noninteractive; apt-get -y update; apt-get -y install eatmydata; eatmydata apt-get -y dist-upgrade"
+             --write /etc/apt/apt.conf.d/90nolanguages:'Acquire::Languages "none";'
