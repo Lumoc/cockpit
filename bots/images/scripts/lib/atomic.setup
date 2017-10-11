@@ -52,8 +52,8 @@ else
     checkout=$(atomic host status --json | python -c 'import json; import sys; j = json.loads(sys.stdin.readline()); print [x for x in j["deployments"] if x["booted"]][0]["checksum"]')
 fi
 
-# Download the libssh RPM which we'll use for package overlay
-# The only way to do this is via a container
+# Download the libssh RPM plus dependencies which we'll use for
+# package overlay.  The only way to do this is via a container
 . /etc/os-release
 REPO="updates"
 if [ "$ID" = "rhel" ]; then
@@ -61,7 +61,13 @@ if [ "$ID" = "rhel" ]; then
     REPO="rhel-7-server-extras-rpms"
     ID="rhel7"
 fi
-docker run --rm --volume=/etc/yum.repos.d:/etc/yum.repos.d:z --volume=/root/rpms:/tmp/rpms:rw,z "$ID:$VERSION_ID" /bin/sh -cex "yum install -y findutils && yum install -y --downloadonly --enablerepo=$REPO libssh && find /var -name '*.rpm' | while read rpm; do mv -v \$rpm /tmp/rpms; done"
+docker run --rm --volume=/etc/yum.repos.d:/etc/yum.repos.d:z --volume=/root/rpms:/tmp/rpms:rw,z "$ID:$VERSION_ID" /bin/sh -cex "yum install -y findutils createrepo_c && yum install -y --downloadonly --enablerepo=$REPO libssh && find /var -name '*.rpm' | while read rpm; do mv -v \$rpm /tmp/rpms; done; createrepo_c /tmp/rpms"
+rm -f /etc/yum.repos.d/*
+cat >/etc/yum.repos.d/deps.repo <<EOF
+[deps]
+baseurl=file:///root/rpms
+enabled=1
+EOF
 
 # Checkout the just upgraded os branch since we'll use it every time
 # we build a new tree.
