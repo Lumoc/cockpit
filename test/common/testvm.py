@@ -1185,6 +1185,7 @@ class VirtMachine(Machine):
 
     def wait_poweroff(self, timeout_sec=120):
         # shutdown must have already been triggered
+        print >> sys.stderr, "XXXX testvm wait_poweroff; domain = ", self._domain
         if self._domain:
             start_time = time.time()
             while (time.time() - start_time) < timeout_sec:
@@ -1207,16 +1208,23 @@ class VirtMachine(Machine):
                     raise
         self._cleanup(quick=True)
 
-    def shutdown(self, timeout_sec=120):
+    def shutdown(self, timeout_sec=12000):
         # shutdown the system gracefully
         # to stop it immediately, use kill()
+        print >> sys.stderr, "XXXX testvm shutdown; domain = %s, timeout %i" % (self._domain, timeout_sec)
+        mon = subprocess.Popen([ "virsh", "event", "--all", "--loop" ])
         self.disconnect()
         try:
             if self._domain:
+                print >> sys.stderr, "XXXX testvm shutdown: sending shutdown"
                 self._domain.shutdown()
+            else:
+                print >> sys.stderr, "XXXX testvm shutdown: no domain!"
             self.wait_poweroff(timeout_sec=timeout_sec)
         finally:
             self._cleanup()
+            mon.terminate()
+            mon.wait()
 
     def add_disk(self, size=None, serial=None, path=None, type='raw'):
         index = len(self._disks)
