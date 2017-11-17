@@ -16,14 +16,6 @@ echo "10.111.112.101     f1.cockpit.lan" >> /etc/hosts
 printf "OPENSHIFT CONSOLE\n  https://10.111.112.101:8443\n  Login: scruffy  Password: scruffy\n\n" >> /etc/issue
 printf "OPENSHIFT LISTENING ON LOCALHOST\n  $ ssh -NL 8443:localhost:8443 root@10.111.112.101\n\n" >> /etc/issue
 
-# Disable these things
-ln -sf ../selinux/config /etc/sysconfig/selinux
-printf 'SELINUX=permissive\nSELINUXTYPE=targeted\n' > /etc/selinux/config
-setenforce 0
-systemctl stop firewalld
-dnf -y remove firewalld
-iptables -F
-
 # Wait for x for many minutes
 function wait() {
     for i in $(seq 1 100); do
@@ -35,7 +27,15 @@ function wait() {
     exit 6
 }
 
-wait dnf -y install docker python libselinux-python
+wait dnf -y install docker python3 libselinux-python iptables
+
+# Disable these things
+ln -sf ../selinux/config /etc/sysconfig/selinux
+printf 'SELINUX=permissive\nSELINUXTYPE=targeted\n' > /etc/selinux/config
+setenforce 0
+systemctl stop firewalld
+dnf -y remove firewalld
+iptables -F
 
 hostnamectl set-hostname f1.cockpit.lan
 
