@@ -35,7 +35,7 @@ function wait() {
     exit 6
 }
 
-wait dnf -y install docker python libselinux-python
+wait dnf -y install docker python3 libselinux-python iptables
 
 hostnamectl set-hostname f1.cockpit.lan
 
