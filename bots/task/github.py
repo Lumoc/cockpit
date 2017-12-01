@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # This file is part of Cockpit.
@@ -22,7 +22,7 @@
 # our GitHub interacition.
 
 import errno
-import httplib
+import http.client
 import json
 import os
 import re
@@ -30,9 +30,9 @@ import socket
 import subprocess
 import sys
 import time
-import urlparse
+import urllib.parse
 
-import cache
+from . import cache
 
 __all__ = (
     'GitHub',
@@ -79,7 +79,7 @@ def determine_github_base():
                 stdout=subprocess.PIPE, cwd=BASE
             ).communicate()[0].strip()
         for f in formats:
-            m = f.match(remote_output)
+            m = f.match(remote_output.decode('utf-8'))
             if m:
                 return list(m.groups())[0]
     except subprocess.CalledProcessError:
@@ -136,7 +136,7 @@ class GitHub(object):
         if base is None:
             netloc = os.environ.get("GITHUB_API", "https://api.github.com")
             base = "{0}/repos/{1}/".format(netloc, os.environ.get("GITHUB_BASE", determine_github_base()))
-        self.url = urlparse.urlparse(base)
+        self.url = urllib.parse.urlparse(base)
         self.conn = None
         self.token = None
         self.debug = False
@@ -162,7 +162,7 @@ class GitHub(object):
         self.log.write("")
 
     def qualify(self, resource):
-        return urlparse.urljoin(self.url.path, resource)
+        return urllib.parse.urljoin(self.url.path, resource)
 
     def request(self, method, resource, data="", headers=None):
         if headers is None:
@@ -174,9 +174,9 @@ class GitHub(object):
         while not connected:
             if not self.conn:
                 if self.url.scheme == 'http':
-                    self.conn = httplib.HTTPConnection(self.url.netloc)
+                    self.conn = http.client.HTTPConnection(self.url.netloc)
                 else:
-                    self.conn = httplib.HTTPSConnection(self.url.netloc, strict=True)
+                    self.conn = http.client.HTTPSConnection(self.url.netloc)
                 connected = True
             self.conn.set_debuglevel(self.debug and 1 or 0)
             try:
@@ -189,7 +189,7 @@ class GitHub(object):
                     raise
                 self.conn = None
             # This happens when GitHub disconnects a keep-alive connection
-            except httplib.BadStatusLine:
+            except http.client.BadStatusLine:
                 if connected:
                     raise
                 self.conn = None
@@ -207,7 +207,7 @@ class GitHub(object):
             "status": response.status,
             "reason": response.reason,
             "headers": heads,
-            "data": response.read()
+            "data": response.read().decode('utf-8')
         }
 
     def get(self, resource):
@@ -335,7 +335,7 @@ class Checklist(object):
     @staticmethod
     def format_line(item, check):
         status = ""
-        if isinstance(check, basestring):
+        if isinstance(check, str):
             status = check + ": "
             check = False
         return " * [{0}] {1}{2}".format(check and "x" or " ", status, item)
@@ -368,7 +368,7 @@ class Checklist(object):
                     line = self.format_line(item, check)
                 self.items[item] = check
             lines.append(line)
-        for item, check in items.items():
+        for item, check in list(items.items()):
             lines.append(self.format_line(item, check))
             self.items[item] = check
         self.body = "\n".join(lines)

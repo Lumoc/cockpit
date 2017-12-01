@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # This file is part of Cockpit.
@@ -90,7 +90,7 @@ def scan_for_prune():
 
 def scan(api, force, verbose):
     subprocess.check_call([ "git", "fetch", "origin", "master" ])
-    for (image, options) in REFRESH.items():
+    for (image, options) in list(REFRESH.items()):
         perform = False
 
         if force:

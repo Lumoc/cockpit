@@ -1,4 +1,4 @@
-#!/usr/bin/python2
+#!/usr/bin/python3
 # -*- coding: utf-8 -*-
 
 # This file is part of Cockpit.
@@ -18,13 +18,15 @@
 # You should have received a copy of the GNU Lesser General Public License
 # along with Cockpit; If not, see <http://www.gnu.org/licenses/>.
 
+import imp
 import os
 import sys
 import unittest
 
-import github
-
 BASE = os.path.dirname(__file__)
+sys.path.insert(1, os.path.join(BASE, ".."))
+
+from task import github
 
 class TestChecklist(unittest.TestCase):
     def testParse(self):
