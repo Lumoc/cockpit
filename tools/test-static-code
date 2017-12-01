@@ -30,7 +30,7 @@ fi
 #   'parent' imported but unused
 #   'from testlib import *' used; unable to detect undefined names
 # Filter these out until these get fixed properly.
-if ! which pyflakes >/dev/null 2>&1; then
+if ! which pyflakes python3 >/dev/null 2>&1; then
     echo "ok 2 pyflakes bots test # SKIP pyflakes not installed"
 
 else
