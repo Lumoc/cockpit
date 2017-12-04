@@ -22,7 +22,6 @@ printf 'SELINUX=permissive\nSELINUXTYPE=targeted\n' > /etc/selinux/config
 setenforce 0
 systemctl stop firewalld
 dnf -y remove firewalld
-iptables -F
 
 # Wait for x for many minutes
 function wait() {
