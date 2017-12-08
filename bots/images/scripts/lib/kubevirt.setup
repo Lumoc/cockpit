@@ -1,0 +1,22 @@
+#!/bin/bash
+set -ex
+
+KUBEVIRT_DIR="/kubevirt"
+rm -rf ${KUBEVIRT_DIR}
+mkdir -p ${KUBEVIRT_DIR}
+cd ${KUBEVIRT_DIR}
+
+# download latest Kubevirt release
+KUBEVIRT_RELEASE_ID=`curl -sL https://api.github.com/repos/kubevirt/kubevirt/releases/latest | grep -m 1 \"id\": | sed -e 's/^.*\"id\":\s*\(.*\),/\1/'`
+echo Latest Kubevirt release found: ${KUBEVIRT_RELEASE_ID}
+
+# Store kubevirt's manifests and binaries for later use within tests
+for ASSET in `curl -sL https://api.github.com/repos/kubevirt/kubevirt/releases/${KUBEVIRT_RELEASE_ID}/assets | grep \"browser_download_url\": | sed -e 's/^.*\"browser_download_url\":.*\"\(.*\)\".*$/\1/'` ; do
+    curl -sL -O ${ASSET}
+done
+
+# pre-pull related images (will be applied later)
+for IMAGE in `grep -h 'image:' *.yaml | sed -e 's/^.*image://g'` ; do
+    echo Pulling image for Kubevirt: ${IMAGE}
+    docker pull ${IMAGE}
+done
