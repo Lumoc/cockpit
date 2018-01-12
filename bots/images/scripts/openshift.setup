@@ -118,6 +118,7 @@ docker pull "openshift/origin-pod:$VERSION"
 
 # Now pull images used for integration tests
 docker pull registry:2
+docker images | grep "docker.io/registry"
 
 # HACK: Make openshift registry recognize docker registrys with the OpenShift CA
 # (https://github.com/openshift/origin/issues/1753)
@@ -282,4 +283,7 @@ dnf install -y cockpit-system
 dnf clean all
 /var/lib/testvm/zero-disk.setup
 
+echo "--------------"
 docker images
+docker images | wc
+
