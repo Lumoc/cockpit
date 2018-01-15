@@ -118,7 +118,7 @@ docker pull "openshift/origin-pod:$VERSION"
 
 # Now pull images used for integration tests
 docker pull registry:2
-docker images | grep "docker.io/registry"
+sleep 5 && echo debug_01 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 
 # HACK: Make openshift registry recognize docker registrys with the OpenShift CA
 # (https://github.com/openshift/origin/issues/1753)
@@ -137,6 +137,8 @@ cd /tmp/
 rm -r /tmp/registry
 cp /openshift.local.config/master/ca.crt /etc/pki/ca-trust/source/anchors/openshift-ca.crt
 update-ca-trust extract
+
+sleep 5 && echo debug_03 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 
 mkdir -p /root/.kube
 cp /openshift.local.config/master/admin.kubeconfig /root/.kube/config
@@ -193,6 +195,7 @@ oc create -f /tmp/imagestream.json
 echo '{"apiVersion":"v1","kind":"ImageStream","metadata": {"name":"origin"}}' > /tmp/imagestream.json
 oc create -f /tmp/imagestream.json
 
+sleep 5 && echo debug_04 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 # Get ready to push busybox into place
 docker pull busybox
 docker tag busybox registry:5000/marmalade/busybee:latest
@@ -216,6 +219,7 @@ docker build -t registry:5000/marmalade/juggs:2.9 .
 cd /tmp
 rm -r /tmp/juggs
 
+sleep 5 && echo debug_05 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 docker push registry:5000/marmalade/juggs
 
 # Tag this image twice
@@ -224,6 +228,7 @@ docker push registry:5000/marmalade/origin
 docker tag "openshift/origin:$VERSION" registry:5000/marmalade/origin
 docker push registry:5000/marmalade/origin
 
+sleep 5 && echo debug_06 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 oc new-project pizzazz
 
 # Some big image streams
@@ -240,6 +245,7 @@ for j in $(seq 1 100); do
 done
 docker push registry:5000/pizzazz/monster
 
+sleep 5 && echo debug_07 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 # Use the admin context by default
 oc config use-context default/10-111-112-101:8443/system:admin
 
@@ -253,6 +259,7 @@ printf '{"kind":"OAuthClient","apiVersion":"v1","metadata":{"name":"cockpit-oaut
 # Wait for it to download
 wait images_has busybox
 
+sleep 5 && echo debug_08 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 # Setup basics for building images
 docker build -t cockpit/base /var/tmp/cockpit-base
 
@@ -274,9 +281,11 @@ printf 'AuthorizedKeysCommand /usr/local/bin/authorized-kube-keys --kubeconfig=/
 # Pull down remaining images
 /var/lib/testvm/docker-images.setup
 
+sleep 5 && echo debug_09 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 # Prepare Kubevirt for later installation
 /var/lib/testvm/kubevirt.setup
 
+sleep 5 && echo debug_10 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 dnf install -y cockpit-system
 
 # reduce image size
@@ -286,4 +295,5 @@ dnf clean all
 echo "--------------"
 docker images
 docker images | wc
+sleep 5 && echo debug_11 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
 
