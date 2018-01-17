@@ -38,6 +38,11 @@ done
 
 (sleep 5 && echo debug_zero_disk_01 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
 
+systemctl stop docker
+sync
+systemctl start docker
+(sleep 5 && echo debug_zero_disk_01_2 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
 if [ -d "/var/cache" ]; then
     find /var/cache/* -maxdepth 0 -depth -name "*" $keep -exec rm -rf {} \;
 fi
@@ -50,16 +55,20 @@ rm -rf /var/tmp/*
 rm -rf /var/log/journal/*
 (sleep 5 && echo debug_zero_disk_03 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
 
+systemctl stop docker
+sleep 10
+
 dd if=/dev/zero of=/root/junk || true
 echo "Filling with zeros done"
 
 # disk is full at this moment
-(echo debug_zero_disk_04 && docker images) || true
-
 sync
 
-(echo debug_zero_disk_05 && docker images) || true
+systemctl start docker
+(sleep 10 && echo debug_zero_disk_05 && docker images) || true
 
 rm -f /root/junk
 
 (sleep 5 && echo debug_zero_disk_06 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
+dmesg
