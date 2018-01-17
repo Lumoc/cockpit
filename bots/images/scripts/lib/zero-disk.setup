@@ -36,12 +36,30 @@ while [ $# -gt 0 ]; do
     shift
 done
 
+(sleep 5 && echo debug_zero_disk_01 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
 if [ -d "/var/cache" ]; then
     find /var/cache/* -maxdepth 0 -depth -name "*" $keep -exec rm -rf {} \;
 fi
+
+(sleep 5 && echo debug_zero_disk_02 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
 rm -rf /var/tmp/*
+(sleep 5 && echo debug_zero_disk_02_1 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
 rm -rf /var/log/journal/*
+(sleep 5 && echo debug_zero_disk_03 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
 
 dd if=/dev/zero of=/root/junk || true
+echo "Filling with zeros done"
+
+# disk is full at this moment
+(echo debug_zero_disk_04 && docker images) || true
+
 sync
+
+(echo debug_zero_disk_05 && docker images) || true
+
 rm -f /root/junk
+
+(sleep 5 && echo debug_zero_disk_06 > /tmp/o && docker images >> /tmp/o  && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true

@@ -304,21 +304,33 @@ docker info
 dnf clean all
 /var/lib/testvm/zero-disk.setup
 
-sleep 5 && echo debug_11 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o
+(sleep 5 && echo debug_11 > /tmp/o && docker images | grep "docker.io/registry" >> /tmp/o && cat /tmp/o) || true
+
 dnf install -y cockpit-system
 
 # Verify all pulled docker images are really present
 echo "--------------"
 echo All present images:
 docker images
+echo "Total docker images:"
 docker images | wc
 
-docker images | tr -s ' ' | cut -d ' ' --output-delimiter=: -f1,2 > /tmp/presentImages
+#docker images | tr -s ' ' | cut -d ' ' --output-delimiter=: -f1,2 > /tmp/presentImages
+docker images --format "{{.Repository}}:{{.Tag}}" > /tmp/presentImages
 
-echo All pulled images
+echo
+echo All images actually pulled
+cat /tmp/presentImages
+echo
+
+echo
+echo All images expected to be pulled
 cat /tmp/pulledImages
+echo
 
+# Verify all expected are actually pulled
 while read img ; do
   echo Verify "$img"
   grep "$img" /tmp/presentImages || echo "Warning: Image $img is missing"
 done < /tmp/pulledImages
+
