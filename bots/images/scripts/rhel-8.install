@@ -1,0 +1,6 @@
+#! /bin/bash
+
+set -e
+
+# kubernetes and libvirt are not currently available in RHEL-8
+/var/lib/testvm/fedora.install --rhel --skip cockpit-kubernetes --skip cockpit-machines --skip cockpit-machines-ovirt "$@"
