@@ -114,14 +114,13 @@ WantedBy=default.target
 
         b.switch_to_top()
 
-        if m.image != "rhel-7-4":
-            # The top bar should not be visible on fedora-atomic because no dashboards
-            b.wait_present(".area-ct-body")
-            if "atomic" in m.image:
-                b.wait_present(".area-ct-body.single-nav")
-            else:
-                b.wait_not_present(".area-ct-body.single-nav")
-            b.wait_present("#host-nav")
+        # The top bar should not be visible on fedora-atomic because no dashboards
+        b.wait_present(".area-ct-body")
+        if "atomic" in m.image:
+            b.wait_present(".area-ct-body.single-nav")
+        else:
+            b.wait_not_present(".area-ct-body.single-nav")
+        b.wait_present("#host-nav")
 
         # Lets try changing the language
 
@@ -210,7 +209,6 @@ WantedBy=default.target
         b.wait_present('#file-content')
         b.wait_text('#file-content', "1")
 
-    @skipImage("Shell too old", "rhel-7-4")
     def testShellReload(self):
         b = self.browser
         m = self.machine
