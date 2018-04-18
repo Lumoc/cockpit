@@ -32,6 +32,7 @@ selinux-basics \
 thin-provisioning-tools \
 xdg-utils \
 udisks2 \
+udisks2-lvm2 \
 "
 
 # We also install the packages necessary to join a FreeIPA domain so
