@@ -76,8 +76,11 @@ class TestOpenshift(MachineCase, OpenshiftCommonTests):
 
         wait_project(self.openshift, "marmalade")
 
+        self.openshift.execute("oc project default")
+
         # Expect the default container user limitations during testing
         self.openshift.execute("oc patch securitycontextconstraints restricted -p '{ \"runAsUser\": { \"type\": \"MustRunAsRange\" } }'")
+
 
         self.browser.wait_timeout(120)
 
@@ -776,6 +779,7 @@ class TestRegistry(MachineCase, RegistryTests):
         with open(tmpfile, "r") as f:
             self.machine.execute("mkdir -p /home/admin/.kube && cat > /home/admin/.kube/config", input=f.read())
         wait_project(self.openshift, "marmalade")
+        self.openshift.execute("oc project default")
 
         self.browser.wait_timeout(120)
 
