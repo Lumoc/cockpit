@@ -321,7 +321,7 @@ class PullTask(object):
         (prefix, unused, value) = self.context.partition("/")
 
         if prefix in [ 'selenium', 'container', 'avocado' ]:
-            image = 'fedora-26'
+            image = 'fedora-28'
         else:
             image = value
         os.environ["TEST_OS"] = image
