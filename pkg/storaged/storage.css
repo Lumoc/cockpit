@@ -662,3 +662,50 @@ span.radio input[type=radio] {
 span.radio label {
     margin-right: 1em;
 }
+
+.key-slot-panel-remaining {
+    margin-right: 1em;
+}
+
+.key-slot-panel td:nth-child(1),
+.key-slot-panel td:nth-child(3),
+.key-slot-panel td:nth-child(4) {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.key-slot-panel td:nth-child(1) {
+    padding-right: 1em;
+}
+
+.key-slot-panel td:nth-child(3) {
+    padding-right: 2em;
+}
+
+.sigkey-hash {
+    font-family: monospace;
+    font-size: 200%;
+}
+
+pre.inline-pre {
+    display: inline;
+    padding: 4px;
+}
+
+.pficon.large {
+    font-size: 200%;
+}
+
+.large {
+    font-size: 150%;
+}
+
+#dialog input.radio-child {
+    margin-left: 20px;
+    width: 450px;
+}
+
+#dialog div.radio-child {
+    margin-left: 20px;
+    color: red;
+}
