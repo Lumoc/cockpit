@@ -154,8 +154,9 @@ import { show_modal_dialog } from "cockpit-components-dialog.jsx";
 import { StatelessSelect, SelectEntry } from "cockpit-components-select.jsx";
 const _ = cockpit.gettext;
 
-const Validated = ({ errors, error_key, children }) => {
+const Validated = ({ errors, error_key, explainer, children }) => {
     var error = errors && errors[error_key];
+    var text = error || explainer;
     // We need to always render the <div> for the has-error
     // class so that the input field keeps the focus when
     // errors are cleared.  Otherwise the DOM changes enough
@@ -163,7 +164,7 @@ const Validated = ({ errors, error_key, children }) => {
     return (
         <div className={error ? "has-error" : ""}>
             { children }
-            { error ? <span className="help-block">{error}</span> : null }
+            { text ? <span className="help-block">{text}</span> : null }
         </div>
     );
 };
@@ -176,7 +177,7 @@ const Row = ({ tag, title, errors, options, children }) => {
             <tr>
                 <td className="top">{title}</td>
                 <td>
-                    <Validated errors={errors} error_key={tag}>
+                    <Validated errors={errors} error_key={tag} explainer={options.explainer}>
                         { children }
                     </Validated>
                 </td>

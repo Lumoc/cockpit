@@ -662,3 +662,47 @@ td.storage-action {
 .radio-horizontal label {
     margin-right: 1em;
 }
+
+.key-slot-panel-remaining {
+    margin-right: 1em;
+}
+
+.shrink {
+    width: 1%;
+    white-space: nowrap;
+}
+
+.key-slot-panel .key-type {
+    padding-right: 1em;
+}
+
+.key-slot-panel .key-slot {
+    padding-right: 2em;
+}
+
+.sigkey-hash {
+    font-family: monospace;
+    font-size: 200%;
+}
+
+.inline-pre {
+    display: inline;
+    padding: 4px;
+}
+
+.large {
+    font-size: 150%;
+}
+
+.pficon.large {
+    font-size: 200%;
+}
+
+.remove-passphrase .indented {
+    padding-left: 20px;
+    width: 100%;
+}
+
+.remove-passphrase .slot-warning {
+    color: #a30000;
+}
