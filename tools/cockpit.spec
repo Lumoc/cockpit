@@ -150,8 +150,7 @@ exec 2>&1
     --with-selinux-config-type=etc_t \
     %{?rhel:--without-storaged-iscsi-sessions} \
     --with-appstream-data-packages='[ "appstream-data" ]' \
-    --with-nfs-client-package='"nfs-utils"' \
-    %{!?build_dashboard:--disable-ssh}
+    --with-nfs-client-package='"nfs-utils"'
 make -j4 %{?extra_flags} all
 
 %check
@@ -175,14 +174,13 @@ echo '{ "linguas": null }' > %{buildroot}%{_datadir}/cockpit/shell/override.json
 echo '%dir %{_datadir}/cockpit/base1' > base.list
 find %{buildroot}%{_datadir}/cockpit/base1 -type f >> base.list
 echo '%{_sysconfdir}/cockpit/machines.d' >> base.list
+find %{buildroot}%{_datadir}/cockpit/ssh -type f >> base.list
 
 %if %{defined build_dashboard}
 echo '%dir %{_datadir}/cockpit/dashboard' >> dashboard.list
 find %{buildroot}%{_datadir}/cockpit/dashboard -type f >> dashboard.list
-find %{buildroot}%{_datadir}/cockpit/ssh -type f >> dashboard.list
 %else
 rm -rf %{buildroot}/%{_datadir}/cockpit/dashboard
-rm -rf %{buildroot}/%{_datadir}/cockpit/ssh
 touch dashboard.list
 %endif
 
@@ -271,7 +269,7 @@ touch kubernetes.list
 
 # when not building basic packages, remove their files
 %if 0%{?build_basic} == 0
-for pkg in base1 branding motd kdump networkmanager realmd selinux shell sosreport static storaged systemd tuned users; do
+for pkg in base1 branding motd kdump networkmanager realmd selinux shell sosreport ssh static storaged systemd tuned users; do
     rm -r %{buildroot}/%{_datadir}/cockpit/$pkg
 done
 for data in applications doc locale man metainfo pixmaps; do
@@ -285,11 +283,12 @@ for libexec in cockpit-askpass cockpit-session cockpit-ws; do
 done
 rm -r %{buildroot}/%{_libdir}/security %{buildroot}/%{_sysconfdir}/pam.d %{buildroot}/%{_sysconfdir}/motd.d %{buildroot}/%{_sysconfdir}/issue.d
 rm %{buildroot}/usr/bin/cockpit-bridge %{buildroot}/usr/sbin/remotectl
+rm -f %{buildroot}%{_libexecdir}/cockpit-ssh
 %endif
 
 # when not building optional packages, remove their files
 %if 0%{?build_optional} == 0
-for pkg in apps dashboard docker kubernetes machines ostree ovirt packagekit pcp playground ssh; do
+for pkg in apps dashboard docker kubernetes machines ostree ovirt packagekit pcp playground; do
     rm -rf %{buildroot}/%{_datadir}/cockpit/$pkg
 done
 # files from -tests
@@ -298,8 +297,6 @@ rm -r %{buildroot}/%{_prefix}/%{__lib}/cockpit-test-assets %{buildroot}/%{_sysco
 rm -r %{buildroot}/%{_libexecdir}/cockpit-pcp %{buildroot}/%{_localstatedir}/lib/pcp/
 # files from -kubernetes
 rm -f %{buildroot}/%{_libexecdir}/cockpit-kube-auth %{buildroot}/%{_libexecdir}/cockpit-kube-launch %{buildroot}/%{_libexecdir}/cockpit-stub
-# files from -dashboard
-rm -f %{buildroot}%{_libexecdir}/cockpit-ssh
 %endif
 
 sed -i "s|%{buildroot}||" *.list
@@ -366,6 +363,10 @@ machines.
 %package bridge
 Summary: Cockpit bridge server-side component
 Requires: glib-networking
+Requires: libssh >= %{libssh_version}
+Provides: cockpit-ssh = %{version}-%{release}
+# cockpit-ssh moved from dashboard to bridge in 171
+Conflicts: cockpit-dashboard < 170.x
 
 %description bridge
 The Cockpit bridge component installed server side and runs commands on the
@@ -376,6 +377,7 @@ system on behalf of the web based user interface.
 %doc %{_mandir}/man1/cockpit-bridge.1.gz
 %{_bindir}/cockpit-bridge
 %{_libexecdir}/cockpit-askpass
+%{_libexecdir}/cockpit-ssh
 
 %package doc
 Summary: Cockpit deployment and developer guide
@@ -699,10 +701,8 @@ Cockpit support for reading PCP metrics and loading PCP archives.
 %if %{defined build_dashboard}
 %package -n cockpit-dashboard
 Summary: Cockpit remote servers and dashboard
-Requires: libssh >= %{libssh_version}
-Provides: cockpit-ssh = %{version}-%{release}
-# nothing depends on the dashboard, but we can't use it with older versions of the bridge
-Conflicts: cockpit-bridge < 135
+BuildArch: noarch
+Requires: cockpit-ssh >= 170.x
 Conflicts: cockpit-ws < 135
 
 %description -n cockpit-dashboard
@@ -710,7 +710,6 @@ Cockpit support for connecting to remote servers (through ssh),
 bastion hosts, and a basic dashboard.
 
 %files -n cockpit-dashboard -f dashboard.list
-%{_libexecdir}/cockpit-ssh
 
 %endif
 

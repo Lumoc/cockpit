@@ -21,6 +21,6 @@ upgrade
 
 set -eu
 
-dnf install -y sed findutils glib-networking json-glib libssh openssl python3
+dnf install -y sed findutils glib-networking json-glib libssh openssl python3 polkit-libs
 
 dnf clean all
