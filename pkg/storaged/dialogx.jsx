@@ -157,16 +157,20 @@ const Validated = ({ errors, error_key, children }) => {
 };
 
 const Row = ({ tag, title, errors, children }) => {
-    return (
-        <tr>
-            <td className="top">{title}</td>
-            <td>
-                <Validated errors={errors} error_key={tag}>
-                    { children }
-                </Validated>
-            </td>
-        </tr>
-    );
+    if (tag) {
+        return (
+            <tr>
+                <td className="top">{title}</td>
+                <td>
+                    <Validated errors={errors} error_key={tag}>
+                        { children }
+                    </Validated>
+                </td>
+            </tr>
+        );
+    } else {
+        return <tr><td colSpan="2">{ children }</td></tr>;
+    }
 };
 
 function is_visible(field, values) {
@@ -357,6 +361,19 @@ export const TextInputChecked = (tag, title, options) => {
                            value={val} onChange={event => change(event.target.value)} />
                 </div>
             );
+        }
+    };
+};
+
+export const Intermission = (children, options) => {
+    return {
+        tag: false,
+        title: "",
+        options: options,
+        initial_value: false,
+
+        render: () => {
+            return <div className="intermission">{ children }</div>;
         }
     };
 };
