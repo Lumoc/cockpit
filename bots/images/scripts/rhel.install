@@ -2,4 +2,5 @@
 
 set -e
 
-/var/lib/testvm/fedora.install --rhel "$@"
+# HACK: neither kubernetes-client nor atomic-openshift-clients are available in 7.6 nightlies
+/var/lib/testvm/fedora.install --rhel --skip cockpit-kubernetes "$@"
