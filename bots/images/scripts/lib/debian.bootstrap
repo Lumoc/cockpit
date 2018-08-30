@@ -18,6 +18,7 @@ fi
 # 18.04 virt-builder image has an invalid apt proxy leftover; delete it
 virt-builder $virt_builder_image \
              $virt_builder_caching \
+             --verbose \
              --output "$out" \
              --size 8G \
              --format qcow2 \
