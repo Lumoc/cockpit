@@ -814,6 +814,7 @@ class MachineCase(unittest.TestCase):
         if self.image in ['fedora-28', 'fedora-atomic', 'fedora-testing', 'fedora-i386']:
             self.allowed_messages.append('audit: type=1400 audit(.*): avc:  denied  { dac_override }.*')
             self.allowed_messages.append('audit: type=1400 audit(.*): avc:  denied  { module_request }.*')
+        if self.image in ['fedora-29', 'fedora-28', 'fedora-atomic', 'fedora-testing', 'fedora-i386']:
             self.allowed_messages.append('audit: type=1400 audit(.*): avc:  denied  { getattr } for .* comm="which" path="/usr/sbin/setfiles".*')
 
         if self.image == 'rhel-x':
