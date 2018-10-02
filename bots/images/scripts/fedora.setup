@@ -40,7 +40,7 @@ glib-networking \
 json-glib \
 kexec-tools \
 libssh \
-libvirt \
+libvirt-daemon-kvm \
 libvirt-client \
 libvirt-dbus \
 NetworkManager-team \
