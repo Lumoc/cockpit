@@ -111,7 +111,7 @@ json-glib \
 kexec-tools \
 atomic-openshift-clients \
 libssh \
-libvirt \
+libvirt-daemon-kvm \
 libvirt-client \
 NetworkManager-team \
 openssl \
